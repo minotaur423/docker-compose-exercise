@@ -1,0 +1,43 @@
+name: myApp
+
+services:
+  wpDB:
+    image: mariadb:latest
+    container_name: mariadb-container
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: pass1234
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wp1234
+      MARIADB_DATABASE: wpDB
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - wpnet
+  wordpress:
+    depends_on:
+      - wpDB
+    image: wordpress:latest
+    container_name: wordpress-container
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: wpDB:3306
+      WORDPRESS_DB_NAME: wpDB
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wp1234
+    volumes:
+      - wordpress_data:/var/www/html
+    ports:
+      - "8080:80"
+    networks:
+      - wpnet
+
+volumes:
+  mysql_data:
+  wordpress_data:
+
+networks:
+        wpnet: 
+          driver: bridge
